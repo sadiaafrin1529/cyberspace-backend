@@ -10,21 +10,35 @@ cloudinary.config({
   api_secret: config.cloudinary.api_secret,
 });
 
-export const sendImageToCloudinary = (filePath: string, imageName: string): Promise<string> => {
+const uploadOnce = (filePath: string, safeName: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    if (!fs.existsSync(filePath)) return reject(new Error(`File not found: ${filePath}`));
-    const baseName = path.parse(imageName).name;
-    const safeName = baseName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
-    cloudinary.uploader.upload(filePath, { public_id: safeName, resource_type: 'image', folder: 'cyberspace' },
+    cloudinary.uploader.upload(filePath, { public_id: safeName, resource_type: 'image', folder: 'cyberspace', timeout: 60000 },
       (error, result) => {
         if (error) return reject(new Error(`Cloudinary upload failed: ${error.message}`));
         if (!result) return reject(new Error('No response from Cloudinary'));
-        const secureUrl = result.secure_url;
-        fs.unlink(filePath, (err) => { if (err) console.warn('Failed to delete local file:', err); });
-        resolve(secureUrl);
+        resolve(result.secure_url);
       }
     );
   });
+};
+
+export const sendImageToCloudinary = async (filePath: string, imageName: string, attempts = 3): Promise<string> => {
+  if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
+  const baseName = path.parse(imageName).name;
+  const safeName = baseName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
+
+  let lastError: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const secureUrl = await uploadOnce(filePath, safeName);
+      fs.unlink(filePath, (err) => { if (err) console.warn('Failed to delete local file:', err); });
+      return secureUrl;
+    } catch (err) {
+      lastError = err;
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+  throw lastError;
 };
 
 const uploadsDir = path.join(process.cwd(), 'uploads');

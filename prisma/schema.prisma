@@ -171,3 +171,148 @@ enum NewsStatus {
   DRAFT
   PUBLISHED
 }
+
+model CareerPage {
+  id               Int      @id @default(1)
+  heroTitleAZ      String?
+  heroTitleEN      String?
+  heroTitleRU      String?
+  heroDescAZ       String?  @db.Text
+  heroDescEN       String?  @db.Text
+  heroDescRU       String?  @db.Text
+  heroImageUrl     String?
+  heroCta1AZ       String?
+  heroCta1EN       String?
+  heroCta1RU       String?
+  heroCta2AZ       String?
+  heroCta2EN       String?
+  heroCta2RU       String?
+  introHeadingAZ   String?
+  introHeadingEN   String?
+  introHeadingRU   String?
+  introBodyAZ      String?  @db.Text
+  introBodyEN      String?  @db.Text
+  introBodyRU      String?  @db.Text
+  introImageUrl    String?
+  missionAZ        String?  @db.Text
+  missionEN        String?  @db.Text
+  missionRU        String?  @db.Text
+  visionAZ         String?  @db.Text
+  visionEN         String?  @db.Text
+  visionRU         String?  @db.Text
+  cultureHeadingAZ String?
+  cultureHeadingEN String?
+  cultureHeadingRU String?
+  cultureBodyAZ    String?  @db.Text
+  cultureBodyEN    String?  @db.Text
+  cultureBodyRU    String?  @db.Text
+  seoTitleAZ       String?
+  seoTitleEN       String?
+  seoTitleRU       String?
+  seoDescAZ        String?  @db.Text
+  seoDescEN        String?  @db.Text
+  seoDescRU        String?  @db.Text
+  isPublished      Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
+}
+
+model CareerBenefit {
+  id        Int      @id @default(autoincrement())
+  icon      String?
+  imageUrl  String?
+  titleAZ   String
+  titleEN   String
+  titleRU   String
+  descAZ    String?  @db.Text
+  descEN    String?  @db.Text
+  descRU    String?  @db.Text
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+model CareerExpertise {
+  id        Int      @id @default(autoincrement())
+  icon      String?
+  titleAZ   String
+  titleEN   String
+  titleRU   String
+  descAZ    String?  @db.Text
+  descEN    String?  @db.Text
+  descRU    String?  @db.Text
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+model CareerGalleryImage {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  captionAZ String?
+  captionEN String?
+  captionRU String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([isActive])
+  @@index([order])
+}
+
+model CareerOpportunity {
+  id         Int      @id @default(autoincrement())
+  titleAZ    String
+  titleEN    String
+  titleRU    String
+  department String?
+  location   String?
+  typeAZ     String?
+  typeEN     String?
+  typeRU     String?
+  descAZ     String?  @db.Text
+  descEN     String?  @db.Text
+  descRU     String?  @db.Text
+  isActive   Boolean  @default(true)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+model CareerApplication {
+  id              Int                     @id @default(autoincrement())
+  fullName        String
+  email           String
+  phone           String
+  positionApplied String
+  country         String?
+  linkedinUrl     String?
+  portfolioUrl    String?
+  yearsExperience Int?
+  coverLetter     String?                 @db.Text
+  resumePath      String
+  resumeFileName  String
+  status          CareerApplicationStatus @default(NEW)
+  createdAt       DateTime                @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+}
+
+enum CareerApplicationStatus {
+  NEW
+  REVIEWED
+  SHORTLISTED
+  REJECTED
+}
