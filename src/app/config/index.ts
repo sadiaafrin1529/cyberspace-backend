@@ -20,6 +20,17 @@ export default {
   jwt_refresh_token_expires_in: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
   stripe_secret_key :process.env.STRIPE_SECRET_KEY,
   stripe_publish_key:process.env.PUBLISH_KEY,
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    from: process.env.SMTP_FROM,
+  },
+  hr_email: process.env.HR_EMAIL,
+  // Private CV storage. Never served statically; downloads go through authenticated endpoints.
+  cv_storage_dir: process.env.CV_STORAGE_DIR,
   cloudinary: {
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_KEY,

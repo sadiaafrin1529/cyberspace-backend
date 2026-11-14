@@ -9,7 +9,8 @@ import { partnerRouter } from '../modules/partner/partner.route';
 import { newsRouter } from '../modules/news/news.route';
 import { uploadRouter } from '../modules/upload/upload.route';
 import { categoryRouter } from '../modules/category/category.route';
-import { careerRouter } from '../modules/career/career.route';
+import { jobRouter } from '../modules/job/job.route';
+import { jobApplicationRouter } from '../modules/job/jobApplication.route';
 
 const router = express.Router();
 
@@ -26,7 +27,8 @@ const routes: Route[] = [
   { path: '/news', route: newsRouter },
   { path: '/upload', route: uploadRouter },
   { path: '/categories', route: categoryRouter },
-  { path: '/career', route: careerRouter },
+  { path: '/jobs', route: jobRouter },
+  { path: '/job-applications', route: jobApplicationRouter },
 ];
 
 routes.forEach((route) => router.use(route.path, route.route));
