@@ -117,6 +117,12 @@ model Partner {
   descAZ     String?
   descEN     String?
   descRU     String?
+  categoryAZ String?
+  categoryEN String?
+  categoryRU String?
+  suppliesAZ String?
+  suppliesEN String?
+  suppliesRU String?
   isActive   Boolean  @default(true)
   order      Int      @default(0)
   createdAt  DateTime @default(now())
