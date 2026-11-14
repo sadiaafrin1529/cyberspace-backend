@@ -9,6 +9,12 @@ interface IPartner {
   descAZ?: string;
   descEN?: string;
   descRU?: string;
+  categoryAZ?: string;
+  categoryEN?: string;
+  categoryRU?: string;
+  suppliesAZ?: string;
+  suppliesEN?: string;
+  suppliesRU?: string;
   isActive?: boolean;
   order?: number;
 }
