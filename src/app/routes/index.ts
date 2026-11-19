@@ -11,6 +11,7 @@ import { uploadRouter } from '../modules/upload/upload.route';
 import { categoryRouter } from '../modules/category/category.route';
 import { jobRouter } from '../modules/job/job.route';
 import { jobApplicationRouter } from '../modules/job/jobApplication.route';
+import { solutionRouter } from '../modules/solution/solution.route';
 
 const router = express.Router();
 
@@ -29,6 +30,7 @@ const routes: Route[] = [
   { path: '/categories', route: categoryRouter },
   { path: '/jobs', route: jobRouter },
   { path: '/job-applications', route: jobApplicationRouter },
+  { path: '/solutions', route: solutionRouter },
 ];
 
 routes.forEach((route) => router.use(route.path, route.route));
