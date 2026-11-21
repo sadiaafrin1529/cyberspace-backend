@@ -12,6 +12,8 @@ import { categoryRouter } from '../modules/category/category.route';
 import { jobRouter } from '../modules/job/job.route';
 import { jobApplicationRouter } from '../modules/job/jobApplication.route';
 import { solutionRouter } from '../modules/solution/solution.route';
+import { projectRouter } from '../modules/project/project.route';
+import { projectCategoryRouter } from '../modules/projectCategory/projectCategory.route';
 
 const router = express.Router();
 
@@ -31,6 +33,8 @@ const routes: Route[] = [
   { path: '/jobs', route: jobRouter },
   { path: '/job-applications', route: jobApplicationRouter },
   { path: '/solutions', route: solutionRouter },
+  { path: '/projects', route: projectRouter },
+  { path: '/project-categories', route: projectCategoryRouter },
 ];
 
 routes.forEach((route) => router.use(route.path, route.route));

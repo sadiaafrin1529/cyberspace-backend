@@ -310,3 +310,49 @@ model SolutionTranslation {
 
   @@unique([solutionId, lang])
 }
+
+model ProjectCategory {
+  id           Int                          @id @default(autoincrement())
+  slug         String                       @unique
+  createdAt    DateTime                     @default(now())
+  updatedAt    DateTime                     @updatedAt
+  translations ProjectCategoryTranslation[]
+  projects     Project[]
+}
+
+model ProjectCategoryTranslation {
+  id         Int             @id @default(autoincrement())
+  categoryId Int
+  lang       Lang
+  name       String
+  category   ProjectCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, lang])
+}
+
+model Project {
+  id           Int                  @id @default(autoincrement())
+  slug         String               @unique
+  coverImage   String
+  images       String[]
+  categoryId   Int
+  category     ProjectCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  translations ProjectTranslation[]
+
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model ProjectTranslation {
+  id               Int     @id @default(autoincrement())
+  projectId        Int
+  lang             Lang
+  title            String
+  shortDescription String?
+  description      String? @db.Text
+  project          Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, lang])
+}
