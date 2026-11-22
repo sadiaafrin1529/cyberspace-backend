@@ -1,6 +1,6 @@
 # Cyberspace Backend
 
-REST API for the Cyberspace platform, built with **Express 5**, **Prisma ORM** and **PostgreSQL**. It serves products, categories, inquiries, news, partners, banners, settings, users, job vacancies and applications, and solutions to the Cyberspace frontend ([`cyberspace-web`](https://github.com/mohammodrubel/CyberSpace)).
+REST API for the Cyberspace platform, built with **Express 5**, **Prisma ORM** and **PostgreSQL**. It serves products, categories, inquiries, news, partners, banners, settings, users, job vacancies and applications, and database-driven solution bundles to the Cyberspace frontend ([`cyberspace-web`](https://github.com/mohammodrubel/CyberSpace)).
 
 ## Tech stack
 
@@ -40,7 +40,6 @@ Shared pieces: `middlewares/auth.ts` (JWT + role check), `utils/sendResponse.ts`
 | `News`, `NewsTranslation` | Articles with per-language title, excerpt and body |
 | `Category` | Product categories (slug, per-language name, image, order) |
 | `Job`, `JobTranslation`, `JobApplication` | Vacancies (multilingual) and candidate applications with CV |
-| `Solution`, `SolutionTranslation` | Solutions page content: slug, colour, icon, order, active flag; per language title, short description, key points, full description and SEO fields |
 
 ### Enums
 
@@ -63,22 +62,25 @@ Mounted in `src/app/routes/index.ts`:
 | `/categories` | Product categories |
 | `/jobs` | Vacancies (public: `/jobs/active`) |
 | `/job-applications` | Applications and CV download |
-| `/solutions` | Solutions (public: `/solutions/active`) |
+| `/solutions` | Solution categories and bundles (public: `/solutions/categories`, admin: `/solutions/admin/...`) |
 | `/upload` | Image upload (Cloudinary) |
 
 ### Solutions API
 
+Categories hold bundles; a bundle holds ordered items (optionally linked to a `Product`) and features. All text is stored per language (EN/AZ/RU).
+
 | Method | Path | Access | Description |
 |---|---|---|---|
-| GET | `/solutions/active` | public | Active solutions only |
-| GET | `/solutions/active/:slug` | public | One active solution (404 if unknown or inactive) |
-| GET | `/solutions` | admin | List with `search`, `status=active\|inactive`, `page`, `limit` |
-| GET | `/solutions/:id` | admin | One solution with all translations |
-| POST | `/solutions` | admin | Create (English translation required, slug generated if omitted) |
-| PATCH | `/solutions/:id` | admin | Update; only the languages sent are touched |
-| PATCH | `/solutions/:id/status` | admin | `{ "isActive": boolean }` |
-| PATCH | `/solutions/:id/order` | admin | `{ "order": number }` |
-| DELETE | `/solutions/:id` | admin | Delete (translations cascade) |
+| GET | `/solutions/categories` | public | Active categories with active-bundle count; `?home=true` limits to homepage ones |
+| GET | `/solutions/categories/:slug` | public | One active category with active bundles, items and features |
+| GET/POST | `/solutions/admin/categories` | admin | List (`search`, `status`, `home`, `page`, `limit`) / create |
+| GET/PATCH/DELETE | `/solutions/admin/categories/:id` | admin | Read / update / delete (409 while the category still has bundles) |
+| PATCH | `/solutions/admin/categories/reorder` | admin | `{ "ids": [..] }` sets `sortOrder` from list position |
+| GET/POST | `/solutions/admin/bundles` | admin | List (`categoryId`, `search`, `status`) / create with `items` and `features` |
+| GET/PATCH/DELETE | `/solutions/admin/bundles/:id` | admin | Read / update (`items` and `features`, when sent, replace the list) / delete |
+| PATCH | `/solutions/admin/bundles/reorder` | admin | `{ "ids": [..] }` |
+
+Inquiries (`POST /inquiries`) accept either `productId` or `bundleId`.
 
 Responses use `{ statusCode, success, message, meta?, data }`. Duplicate slugs return 409, invalid ids 400, missing records 404.
 
