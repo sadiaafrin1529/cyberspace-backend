@@ -2,6 +2,7 @@ import catchAsync from '../../utils/catchAsync';
 import { CategoryService } from './category.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
+import { createCategorySchema, updateCategorySchema, categoryQuerySchema } from './category.validation';
 
 const GetAllCategories = catchAsync(async (_req, res) => {
   const result = await CategoryService.GetAllCategories();
@@ -14,12 +15,12 @@ const GetCategoryById = catchAsync(async (req, res) => {
 });
 
 const CreateCategory = catchAsync(async (req, res) => {
-  const result = await CategoryService.CreateCategory(req.body);
+  const result = await CategoryService.CreateCategory(createCategorySchema.parse(req.body));
   sendResponse(res, { success: true, statusCode: httpStatus.CREATED, message: 'Category created', data: result });
 });
 
 const UpdateCategory = catchAsync(async (req, res) => {
-  const result = await CategoryService.UpdateCategory(Number(req.params.id), req.body);
+  const result = await CategoryService.UpdateCategory(Number(req.params.id), updateCategorySchema.parse(req.body));
   sendResponse(res, { success: true, statusCode: httpStatus.OK, message: 'Category updated', data: result });
 });
 

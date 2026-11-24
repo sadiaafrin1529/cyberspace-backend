@@ -6,6 +6,8 @@ import { Role } from '@prisma/client';
 const router = Router();
 
 router.get('/', ProductController.GetAllProducts);
+// Must stay above '/:id'.
+router.get('/shop', ProductController.SearchShopProducts);
 router.get('/:id', ProductController.GetProductById);
 router.post('/', auth(Role.ADMIN), ProductController.CreateProduct);
 router.patch('/:id', auth(Role.ADMIN), ProductController.UpdateProduct);
