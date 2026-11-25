@@ -29,6 +29,13 @@ export default {
     from: process.env.SMTP_FROM,
   },
   hr_email: process.env.HR_EMAIL,
+  // Developer API (see modules/apiKey). All optional.
+  api_key_pepper: process.env.API_KEY_PEPPER,
+  api_key_encryption_secret: process.env.API_KEY_ENCRYPTION_SECRET,
+  api_public_url: process.env.API_PUBLIC_URL,
+  api_rate_limit_per_minute: Number(process.env.API_RATE_LIMIT_PER_MINUTE) || 120,
+  api_log_retention_days: Number(process.env.API_LOG_RETENTION_DAYS) || 90,
+  trust_proxy: process.env.TRUST_PROXY,
   // Private CV storage. Never served statically; downloads go through authenticated endpoints.
   cv_storage_dir: process.env.CV_STORAGE_DIR,
   cloudinary: {

@@ -1,0 +1,127 @@
+{
+  "info": {
+    "name": "Cyberspace Developer API",
+    "description": "Set the collection variables `baseUrl` and `apiKey` (Settings > Developer API > API keys). Run folders top to bottom: IDs are saved automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "X-API-Key", "type": "string" },
+      { "key": "value", "value": "{{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:9000/api/v1" },
+    { "key": "apiKey", "value": "cs_test_PASTE_YOUR_KEY_HERE" },
+    { "key": "categoryId", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "productSku", "value": "LEN-LOQ-15-001" }
+  ],
+  "item": [
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List categories (tree)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categories?tree=true&activeOnly=false", "host": ["{{baseUrl}}"], "path": ["categories"], "query": [{ "key": "tree", "value": "true" }, { "key": "activeOnly", "value": "false" }] }
+          }
+        },
+        {
+          "name": "Create root category",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('categoryId', pm.response.json().data.id);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"slug\": \"laptops\",\n  \"nameEN\": \"Laptops\",\n  \"nameAZ\": \"Noutbuklar\",\n  \"nameRU\": \"Ноутбуки\"\n}" },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Create sub-category (parentSlug)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"slug\": \"gaming-laptops\",\n  \"parentSlug\": \"laptops\",\n  \"nameEN\": \"Gaming laptops\"\n}" },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Create nested sub-category (level 3)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"slug\": \"rtx-gaming-laptops\",\n  \"parentSlug\": \"gaming-laptops\",\n  \"nameEN\": \"RTX gaming laptops\"\n}" },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Get category",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{categoryId}}"] } }
+        },
+        {
+          "name": "Update / move category",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nameEN\": \"Laptops & notebooks\",\n  \"order\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{categoryId}}"] }
+          }
+        },
+        {
+          "name": "Delete category",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{categoryId}}"] } }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/products?category=laptops&page=1&limit=20", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "category", "value": "laptops" }, { "key": "page", "value": "1" }, { "key": "limit", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Create product",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('productId', pm.response.json().data.id);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"sku\": \"LEN-LOQ-15-001\",\n  \"brand\": \"Lenovo\",\n  \"category\": \"rtx-gaming-laptops\",\n  \"imageUrl\": \"https://cdn.example.com/loq-15.jpg\",\n  \"price\": 1299.9,\n  \"currency\": \"USD\",\n  \"stock\": 14,\n  \"translations\": [\n    { \"lang\": \"EN\", \"name\": \"Lenovo LOQ 15\", \"description\": \"15.6 inch gaming laptop, RTX 4050.\" },\n    { \"lang\": \"AZ\", \"name\": \"Lenovo LOQ 15\" }\n  ]\n}" },
+            "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] }
+          }
+        },
+        {
+          "name": "Get product",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["products", "{{productId}}"] } }
+        },
+        {
+          "name": "Get product by SKU",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/products/sku/{{productSku}}", "host": ["{{baseUrl}}"], "path": ["products", "sku", "{{productSku}}"] } }
+        },
+        {
+          "name": "Update product",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"price\": 1199,\n  \"currency\": \"USD\",\n  \"stock\": 9\n}" },
+            "url": { "raw": "{{baseUrl}}/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["products", "{{productId}}"] }
+          }
+        },
+        {
+          "name": "Delete product",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["products", "{{productId}}"] } }
+        }
+      ]
+    }
+  ]
+}

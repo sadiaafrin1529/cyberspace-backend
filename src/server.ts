@@ -1,6 +1,7 @@
 import { Server } from 'http';
 import app from './app';
 import config from './app/config';
+import { startApiMaintenance } from './app/modules/externalApi/externalApi.maintenance';
 
 process.on('uncaughtException', (err) => {
   console.error(err);
@@ -12,6 +13,7 @@ let server: Server | null = null;
 async function startServer() {
   server = app.listen(config.port, () => {
     console.log(`🎯 Server listening on port: ${config.port}`);
+    startApiMaintenance();
   });
 
   process.on('unhandledRejection', (error) => {
