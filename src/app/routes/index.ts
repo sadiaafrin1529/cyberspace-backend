@@ -15,6 +15,8 @@ import { solutionRouter } from '../modules/solution/solution.route';
 import { projectRouter } from '../modules/project/project.route';
 import { projectCategoryRouter } from '../modules/projectCategory/projectCategory.route';
 
+import { apiKeyRouter } from '../modules/apiKey/apiKey.route';
+
 const router = express.Router();
 
 type Route = { path: string; route: express.Router };
@@ -35,6 +37,7 @@ const routes: Route[] = [
   { path: '/solutions', route: solutionRouter },
   { path: '/projects', route: projectRouter },
   { path: '/project-categories', route: projectCategoryRouter },
+  { path: '/api-keys', route: apiKeyRouter },
 ];
 
 routes.forEach((route) => router.use(route.path, route.route));

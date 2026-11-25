@@ -13,7 +13,7 @@ interface IProductTranslation {
 
 interface ICreateProduct {
   sku: string;
-  brand?: string;
+  brand?: string | null;
   category: string;
   imageUrl?: string | null;
   price?: number | null;
@@ -24,7 +24,7 @@ interface ICreateProduct {
 
 interface IUpdateProduct {
   sku?: string;
-  brand?: string;
+  brand?: string | null;
   category?: string;
   imageUrl?: string | null;
   price?: number | null;
@@ -199,6 +199,27 @@ const SearchShopProducts = async (query: ShopQuery) => {
   };
 };
 
+/** Paginated, unmasked listing for the key-authenticated Developer API (same filters as GetAllProducts). */
+const ListProductsPaged = async (filter: ProductFilter, page: number, limit: number) => {
+  const slugs = await resolveCategorySlugs(filter.category, filter.categoryId);
+  const where = buildWhere(filter, slugs, true);
+  const [items, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: { translations: true },
+      orderBy: [{ syncedAt: 'desc' }, { id: 'asc' }],
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.product.count({ where }),
+  ]);
+  return { items, meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+};
+
+const GetProductBySku = async (sku: string) => {
+  return prisma.product.findUnique({ where: { sku }, include: { translations: true } });
+};
+
 const GetProductById = async (id: string) => {
   return prisma.product.findUnique({
     where: { id },
@@ -253,7 +274,12 @@ const UpdateProduct = async (id: string, data: IUpdateProduct) => {
 const DeleteProduct = async (id: string) => {
   const product = await prisma.product.findUnique({ where: { id } });
   if (!product) throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
-  await prisma.product.delete({ where: { id } });
+  // ProductTranslation.productId is ON DELETE RESTRICT, so translations must go first. One transaction keeps
+  // the product intact if the delete is refused (e.g. customer inquiries still reference it).
+  await prisma.$transaction([
+    prisma.productTranslation.deleteMany({ where: { productId: id } }),
+    prisma.product.delete({ where: { id } }),
+  ]);
 };
 
-export const ProductService = { GetAllProducts, SearchShopProducts, GetProductById, CreateProduct, UpdateProduct, DeleteProduct };
+export const ProductService = { GetAllProducts, SearchShopProducts, ListProductsPaged, GetProductBySku, GetProductById, CreateProduct, UpdateProduct, DeleteProduct };

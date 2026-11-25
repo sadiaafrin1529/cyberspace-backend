@@ -198,3 +198,25 @@ prisma/
 seed/
   seed.ts
 ```
+
+## Developer API (API-key access)
+
+External systems can manage categories and products with admin-issued API keys. Keys are created in the admin panel under **Settings → Developer API** (ADMIN only) and are completely separate from website JWT auth.
+
+- Base path: `/api/v1` (send `X-API-Key: <key>`); management routes for the Settings UI: `/api/api-keys` (ADMIN JWT).
+- Only a SHA-256 hash of each key is stored; the full key is shown once. Keys support permissions (`categories:*`, `products:*`), expiry, IP/CIDR allow-list, per-key revocation.
+- Every request is logged to `ApiRequestLog` (no bodies/queries/keys). Rate limit per key, 256 KB body limit, optional `Idempotency-Key` on POST.
+- Docs live in the admin Settings page (source: `cyberspace-web/.../settings/developer/apiDocs.ts`).
+- Code: `modules/apiKey` (management), `modules/externalApi` (middleware, routes, validation).
+
+Migration: `npx prisma migrate deploy` (adds `ApiKey`, `ApiRequestLog`, `ApiIdempotencyKey`; no existing table is altered).
+
+Optional environment variables:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `API_PUBLIC_URL` | request host | Public origin shown in the docs (e.g. `https://api.example.com`) |
+| `API_KEY_PEPPER` | none | Secret mixed into key hashes. Set once before issuing keys; changing it invalidates all keys |
+| `API_RATE_LIMIT_PER_MINUTE` | `120` | Requests per key per minute |
+| `API_LOG_RETENTION_DAYS` | `90` | Request-log retention |
+| `TRUST_PROXY` | off | Express `trust proxy` (hop count, e.g. `1`) so IP allow-lists see the real client IP behind a proxy |
